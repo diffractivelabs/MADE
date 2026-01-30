@@ -1,0 +1,27 @@
+_target_: made.envs.ConvexHullEnvironment
+
+# NOTE: The environment applies TASK-SPECIFIC FILTERING to the raw dataset
+# to define the "effective ground truth" for discovery. All metrics (recall,
+# precision, novelty) are computed against this filtered ground truth.
+
+budget: 5
+
+# dataset and oracle instances are provided by the application at call-site
+
+# Initialization mode
+start_with_all_stable: true # false means start with elemental references only, true means start with all stable entries from MP
+compute_elemental_from_oracle: true # if true, compute elemental reference energies using oracle from dataset structures
+
+# Stability thresholds
+stability_tolerance: 0.1 # Energy tolerance (eV/atom) for considering a phase stable relative to the convex hull
+include_near_stable_from_ground_truth: true # Include GT entries within stability_tolerance of the hull as stable
+
+# FILTERING: These filters define what phases are discoverable in this task
+filter_by_smact: true # Filter out entries that don't pass SMACT validity checks (chemically implausible)
+max_stoichiometry: 20 # Filter out entries with > N atoms per unit cell (null = no filtering)
+
+# StructureMatcher parameters for novelty detection
+structure_matcher_ltol: 0.2
+structure_matcher_stol: 0.3
+structure_matcher_angle_tol: 5
+structure_matcher_primitive_cell: true

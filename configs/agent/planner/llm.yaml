@@ -1,0 +1,50 @@
+_target_: made.agents.planners.llm.LLMPlanner
+
+max_stoichiometry: 20
+num_compositions: 1
+num_candidates: 32
+
+# Context window management - random sample if exceeded
+max_context_entries: 20  # Max history entries to show LLM (null = no limit)
+
+llm_config:
+  model: openai/gpt-5.1 # anthropic/claude-sonnet-4-5-20250929 
+  max_output_tokens: null
+  temperature: null
+  cache: false  # cache responses in dspy
+
+# how to parse the state for the LLM
+context_config:
+  objective_prompt: |
+    You are a planner for a material discovery experiment. Your goal is to discover as many NOVEL, UNIQUE, STABLE (or metastable) structures as possible.
+    
+    CRITICAL CONSTRAINT: You MUST ONLY use elements from the provided 'elements' list in your compositions. And you MUST ONLY propose compositions that are within the max_stoichiometry.
+    - Example: If elements=['Li', 'O'], you can propose Li2O, LiO2, etc., but NOT Na2O, Fe2O3, etc.
+    - Example: If max_stoichiometry=20, you can propose Li2O, LiO2, etc., but NOT Li19O19.
+    
+    DEFINITIONS:
+    - STABLE/METASTABLE: Structures with e_above_hull <= stability_tolerance.
+    - NOVEL: Not already known on the convex hull (is_newly_discovered=True).
+    - UNIQUE: Structurally distinct from previously evaluated structures.
+    - Entries marked is_stable_or_metastable=True with is_newly_discovered=True are successful discoveries.
+
+    PHASE DIAGRAM CONCEPTS:
+    - Reduced formulas (e.g., Li2O) represent UNIQUE POINTS on the phase diagram.
+    - Different reduced compositions = different phase diagram points → PRIORITIZE DIVERSE reduced compositions for broad coverage.
+    
+    STRUCTURE DIVERSITY AT SAME COMPOSITION:
+    - Multiple DIFFERENT structures can exist at the SAME reduced composition (same phase diagram point)
+    - Different structures for the SAME composition can have DIFFERENT stabilities (one unstable doesn't mean all are!)
+    - Different unit cell sizes (Li2O vs Li4O2) create different structures but occupy the SAME phase diagram point
+    
+    STRATEGY:
+    - Explore diverse reduced compositions (different phase diagram points) to maximize phase diagram coverage.
+    - If a reduced composition has yielded stable/metastable NOVEL structures, consider proposing MORE unit cell sizes for it as additional stable polymorphs may exist.
+    - Compositions with only [unstable] entries may still have stable structures. 
+    - Balance exploration (new reduced compositions) vs exploitation (trying to find stable structures for compositions with only [unstable] entries)
+    
+    Propose FULL formulas with specific unit cell sizes (e.g., Li2O, Li4O2, LiO2) not just reduced formulas.
+  include_structure_info: true   # whether to include structure information in the context
+  include_composition_counter: true   # whether to include composition counter in the context
+  include_recent_trial: true   # whether to include recent trial in the context
+  previous_observations: 1  # Number of recent observations to include in LLM context

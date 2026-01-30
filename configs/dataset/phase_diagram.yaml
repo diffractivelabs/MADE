@@ -1,0 +1,12 @@
+_target_: made.data.PhaseDiagramDataset
+
+# NOTE: The dataset provides RAW, UNFILTERED Materials Project data.
+# Task-specific filtering (SMACT, max_stoichiometry, energy thresholds) 
+# is applied at the Environment level (see configs/environment/).
+
+# Elements for the chemical system
+elements:
+  - Li
+  - O
+# Optional: Materials Project thermo types (only filtering applied at dataset level)
+thermo_types: [GGA_GGA+U]

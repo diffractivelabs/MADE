@@ -1,0 +1,35 @@
+_target_: made.agents.scorers.LLMScorer
+
+# LLM backend configuration (mirrors planner config)
+llm_config:
+  model: openai/gpt-5.1 # anthropic/claude-sonnet-4-5-20250929 
+  max_output_tokens: null
+  temperature: null
+  cache: false
+
+# Context window management - random sample if exceeded
+max_candidates: 50  # Max candidates to show LLM (null = no limit)
+max_context_entries: 20  # Max history entries to show LLM (null = no limit)
+
+# How to summarize the state for the LLM selector
+context_config:
+  objective_prompt: |
+    You are selecting one candidate structure to evaluate in a material discovery experiment next.
+    
+    OBJECTIVE: Find as many NOVEL, UNIQUE, STABLE (or metastable) structures as possible. Choose the best candidate structure index from the list of candidates.
+    - Structures with e_above_hull <= stability_tolerance are stable/metastable.
+    - NOVEL: Not already known on the convex hull (is_newly_discovered=True).
+    - UNIQUE: Structurally distinct from previously evaluated structures.
+    - Entries marked [STABLE, NOVEL] or is_stable_or_metastable=True with is_newly_discovered=True are successful discoveries.
+    
+    IMPORTANT:
+    - Multiple different structures can exist as stable/metastable polymorphs at the same composition
+    - One unstable structure for a composition does NOT mean all structures for that composition are unstable.
+    - Balance exploration (diverse structures) vs exploitation (unique structures similar to previously successful structures).
+    
+    
+  include_structure_info: true
+  include_composition_counter: true
+  include_recent_trial: true
+  previous_observations: 1 
+

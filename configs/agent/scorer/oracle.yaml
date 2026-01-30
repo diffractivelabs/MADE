@@ -1,0 +1,18 @@
+_target_: made.agents.scorers.OracleScorer
+
+defaults:
+  # Choose the surrogate oracle independently of the environment's oracle
+  # This oracle is used for pre-ranking candidates (surrogate model)
+  # Choose using oracle@agent.scorer.oracle=<oracle_name>
+  # Override specific options using agent.scorer.oracle.<options>=<value>
+  - /oracle@oracle: mace
+
+# what to score by
+score_function: "e_above_hull" # "energy_per_atom", "formation_energy_per_atom", "e_above_hull"
+
+# Whether to cache surrogate results (enables efficient reranking for e_above_hull)
+enable_cache: true
+
+# Whether to recompute scores when state changes (only relevant for e_above_hull)
+# When enabled, reranks using cached energies without re-evaluating the surrogate
+rerank_on_state_change: true

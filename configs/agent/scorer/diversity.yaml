@@ -1,0 +1,5 @@
+_target_: made.agents.scorers.CompositionDiversity
+distance_metric: euclidean
+seed: null
+
+

@@ -1,0 +1,6 @@
+_target_: made.agents.generators.RandomGenerator
+lattice_length_range: [3.0, 15.0]
+lattice_angle_range: [60.0, 120.0]
+seed: null
+
+

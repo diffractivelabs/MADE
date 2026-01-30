@@ -1,0 +1,15 @@
+_target_: made.agents.generators.CachedGenerator
+
+# Number of candidates to generate and cache initially
+num_initial_candidates: 1024
+
+# Whether to maintain separate cache per composition (True) or global cache (False)
+cache_by_composition: false
+
+# Base generator to use for creating candidates de novo
+base_generator:
+  _target_: made.agents.generators.ChemeleonGenerator
+  task: csp
+  batch_size: 32
+  device: cuda
+  output_dir: null

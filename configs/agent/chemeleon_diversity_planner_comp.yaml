@@ -1,0 +1,24 @@
+_target_: made.agents.OneShotWorkflowAgent
+
+defaults:
+  - planner: diversity
+  - generator: cached
+  - filter: noop
+  - scorer: random
+
+planner:
+  max_stoichiometry: 20
+  num_compositions: 1
+  num_candidates: 32
+  selection_strategy_kwargs:
+    mask_same_reduced_formula: false  # include comparisons between compositions with same reduced formula
+
+generator:
+  num_initial_candidates: 32
+  cache_by_composition: true
+  base_generator:
+    _target_: made.agents.generators.ChemeleonGenerator
+    task: csp
+    batch_size: 256
+    device: cuda
+    output_dir: null

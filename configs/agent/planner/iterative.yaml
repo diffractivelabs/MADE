@@ -1,0 +1,9 @@
+_target_: made.agents.planners.grid_search.GridSearchPlanner
+max_stoichiometry: 20
+num_compositions: 1
+num_candidates: 32
+seed: null
+selection_strategy: "iterative"
+selection_strategy_kwargs:
+  max_attempts_per_composition: 5
+  move_on_success: true

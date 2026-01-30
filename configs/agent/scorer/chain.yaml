@@ -1,0 +1,26 @@
+_target_: made.agents.scorers.ScorerChain
+
+# List of scorers to combine
+scorers:
+  # Example: Combine energy-based scoring with diversity
+  - _target_: made.agents.scorers.OracleScorer
+    score_function: "e_above_hull"
+    enable_cache: true
+    rerank_on_state_change: true
+    defaults:
+      - /oracle@oracle: analytic
+  
+  - _target_: made.agents.scorers.CompositionDiversity
+    distance_metric: "euclidean"
+
+# Weights for each scorer (will be normalized to sum to 1)
+# Default: equal weights [1.0, 1.0, ...]
+weights: [0.7, 0.3]  # 70% weight on energy, 30% on diversity
+
+# Combination method: "weighted_sum" or "pareto"
+combination_method: "weighted_sum"  # Use weighted sum to combine objectives
+
+# Whether to normalize each scorer's scores to [0, 1] before combination
+# Default: true. Set to false if scores are already on comparable scales.
+normalize_scores: true
+

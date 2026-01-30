@@ -1,0 +1,5 @@
+_target_: made.agents.generators.ChemeleonGenerator
+task: csp  # "csp" for Crystal Structure Prediction or "dng" for De Novo Generation
+batch_size: 32
+device: cuda  # "cpu" or "cuda"
+output_dir: null

@@ -1,0 +1,14 @@
+_target_: made.agents.planners.grid_search.GridSearchPlanner
+max_stoichiometry: 20
+num_compositions: 1
+num_candidates: 32
+seed: null
+selection_strategy: "diversity" # uses GridSearchPlanner with diversity selection strategy
+selection_strategy_kwargs:
+  distance_metric: euclidean # euclidean | manhattan | cosine
+  unattempted_weight: 5.0
+  attempt_weight_factor: 0.7
+  failure_weight_factor: 0.3
+  mask_same_reduced_formula: true
+
+

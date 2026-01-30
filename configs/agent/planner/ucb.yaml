@@ -1,0 +1,11 @@
+_target_: made.agents.planners.grid_search.GridSearchPlanner
+max_stoichiometry: 20
+num_compositions: 1
+num_candidates: 32
+seed: null
+selection_strategy: "ucb"
+selection_strategy_kwargs:
+  exploration_factor: 1.0
+  ucb_reward: "failure_rate"
+
+

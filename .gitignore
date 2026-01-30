@@ -205,3 +205,22 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+.DS_Store
+results/
+
+*.cif
+*.zip
+*.extxyz
+*.json.gz
+*.json
+*.pdf
+
+wandb/
+
+# checkpoints
+*.ckpt
+
+# include data
+!data/*
+!data/*/*

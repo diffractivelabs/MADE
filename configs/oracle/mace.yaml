@@ -1,0 +1,27 @@
+_target_: made.oracles.MACEOracle
+# Model type: "mp" (Materials Project), "off" (Organic Force Field), or "custom"
+model_name: mp
+# Model size: "small", "medium", "large", or custom model name
+model: medium
+# Device: "auto", "cpu", or "cuda"
+device: auto
+# Default dtype: "float32" or "float64"
+default_dtype: float32
+# Whether to include dispersion correction (for mace_mp only)
+dispersion: false
+# Path to custom model file (required if model_type is "custom")
+# model_path: null
+# Use MP reference energies if available (from MatBench Discovery)
+element_reference_energies_path: ./data/2023-02-07-mp-elemental-reference-entries.json
+# Use dataset elements unless explicitly overridden
+relax: true
+relax_kwargs:
+  optimizer: fire
+  fmax: 0.02
+  steps: 500
+  relax_unit_cell: true
+
+# Number of worker threads for parallel evaluation (1 = sequential, >1 = parallel)
+# Structures will be automatically batched across workers
+num_workers: 1
+

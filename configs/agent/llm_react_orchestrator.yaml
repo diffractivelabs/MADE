@@ -1,0 +1,121 @@
+# LLM ReAct Orchestrator Agent Configuration
+# 
+# This agent uses DSPy's ReAct to orchestrate various generators, filters, and scorers.
+# It maintains a buffer of pre-validated candidates and decides what actions to take
+# at each step: generate more structures, score them, query for specific criteria, or select.
+#
+# Key features:
+# - All generated structures are filtered before adding to buffer
+# - Uniqueness filter always re-run on new generations (can't be cached)
+# - Flexible buffer queries (topk, bottomk, diverse, by composition)
+# - Caching of structure hashes to avoid duplicate processing
+
+_target_: made.agents.LLMReActOrchestratorAgent
+
+defaults:
+  # scorers
+  - /agent/scorer@scorers.diversity: diversity
+  - /agent/scorer@scorers.random: random
+  - /agent/scorer@scorers.llm: llm
+  - /agent/scorer@scorers.oracle: oracle
+
+  # generators
+  - /agent/generator@generators.chemeleon: chemeleon
+  - /agent/generator@generators.random: random
+
+
+# Static filters - applied automatically after generation (using chain format)
+# These can be cached - results don't change based on state
+static_filters:
+  _target_: made.agents.filters.FilterChain
+  filters:
+    - _target_: made.agents.filters.MinDistanceFilter
+      min_distance_threshold: 0.5
+    - _target_: made.agents.filters.SMACTValidityFilter
+
+# Uniqueness filter configuration (always re-run, not cached)
+# Set to null to disable uniqueness checking
+uniqueness_filter:
+  _target_: made.agents.filters.UniquenessFilter
+  ltol: 0.2
+  stol: 0.3
+  angle_tol: 5.0
+  primitive_cell: true
+
+
+# LLM configuration for DSPy
+llm_config:
+  model: "openai/gpt-5.1" # anthropic/claude-sonnet-4-5-20250929 
+  cache: false
+  max_output_tokens: null
+  temperature: null
+
+# Context configuration with customizable prompts
+context_config:
+  # Whether to include full structure details in evaluation history
+  # Shows complete structure: lattice parameters, all atomic species and positions
+  # Helps LLM learn structural patterns from past discoveries
+  include_structure_in_history: true
+  
+  # Whether to include full structure details in known stable materials from phase diagram
+  # Shows complete structure: lattice parameters, all atomic species and positions
+  # Helps LLM understand what stable structures already exist
+  include_structure_in_known_materials: false
+  
+  # Main ReAct orchestration prompt
+  orchestration_prompt: |
+    You are an autonomous materials discovery agent.
+    
+    OBJECTIVE: Find as many NOVEL, UNIQUE, STABLE (or metastable) structures as possible. Use the available tools, then select ONE composition + structure for oracle evaluation.
+
+    - Structures with e_above_hull <= stability_tolerance are stable/metastable (SUCCESS!)
+    - Entries marked [STABLE, NOVEL] in evaluation_history are successful discoveries
+    - We want to MAXIMIZE the number of novel stable structures found
+    
+    IMPORTANT: Different structures for the SAME composition can have DIFFERENT stabilities.
+    - One unstable structure for a composition does NOT mean all structures for that composition are unstable.
+    - Generators produce many different structures for the same composition
+    
+    UNIT CELL SIZE MATTERS:
+    - Compositions are stored by REDUCED formula (e.g., Li2O)
+    - But you can generate different UNIT CELL SIZES: Li2O, Li4O2, Li6O3, etc.
+    - These occupy the same position on the phase diagram but are different structures
+    - Different unit cell sizes often have different stabilities
+    
+    BUFFER ORGANIZATION:
+    - Buffer is organized by reduced formula: {composition: [structures]}
+    - Each structure shows its full formula (unit cell size) and index
+    - Selection is two-step: pick composition, then pick structure index
+        
+    WORKFLOW:
+    1. Decide which composition(s) to explore based on evaluation history
+    2. Generate/create candidate structures for those compositions
+    3. Score candidates if needed to prioritize within each composition
+    4. List compositions and query structures to decide what to evaluate
+    5. Select ONE composition + structure for oracle evaluation
+    
+    STRATEGY GUIDANCE:
+    - If buffer empty/small: Generate more structures (diverse compositions OR more for promising ones)
+    - If buffer has candidates: Score them, query compositions, select best
+    - Balance exploration (new compositions) vs exploitation (more structures for successful compositions)
+    
+
+# Enabled tools (list of tool names)
+# Available: generate_structures, create_structure, score_buffer, list_compositions, query_structures, get_buffer_stats, select_for_evaluation
+enabled_tools:
+  - generate_structures  # Generate structures using generators
+  - create_structure     # LLM can create structures directly by specifying lattice + sites
+  - score_buffer         # Score structures in buffer (all or by composition)
+  - list_compositions    # List compositions with counts and optional scores
+  - query_structures     # Query structures within a specific composition
+  - get_buffer_stats     # Get detailed buffer statistics
+  - select_for_evaluation  # Select composition + structure for oracle evaluation
+
+# ReAct configuration
+max_iters: 10  # Maximum iterations per step
+
+# Constraints
+max_stoichiometry: 20
+
+# History settings
+max_history_length: 20  # Max evaluation history entries to show LLM

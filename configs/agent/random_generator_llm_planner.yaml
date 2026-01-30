@@ -1,0 +1,19 @@
+_target_: made.agents.OneShotWorkflowAgent
+
+defaults:
+  - planner: llm
+  - generator: cached
+  - filter: noop
+  - scorer: random
+
+planner:
+  max_stoichiometry: 20
+  num_compositions: 1
+  num_candidates: 32
+
+generator:
+  num_initial_candidates: 32
+  cache_by_composition: true
+  base_generator:
+    _target_: made.agents.generators.RandomGenerator
+

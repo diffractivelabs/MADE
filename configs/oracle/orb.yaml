@@ -1,0 +1,17 @@
+_target_: made.oracles.ORBOracle
+# Enum-like string values will be converted inside the class; strings here are fine
+model_name: orb-v3-conservative-inf-omat
+device: auto
+# use MP reference energies if available (from MatBench Discovery)
+element_reference_energies_path: ./data/2023-02-07-mp-elemental-reference-entries.json
+# Use dataset elements unless explicitly overridden
+relax: true
+relax_kwargs:
+  optimizer: fire
+  fmax: 0.02
+  steps: 500
+  relax_unit_cell: true
+
+# Number of worker threads for parallel evaluation (1 = sequential, >1 = parallel)
+# Structures will be automatically batched across workers
+num_workers: 1

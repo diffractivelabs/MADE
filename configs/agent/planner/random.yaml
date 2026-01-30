@@ -1,0 +1,6 @@
+_target_: made.agents.planners.grid_search.GridSearchPlanner
+max_stoichiometry: 20
+num_compositions: 8 # number of compositions to generate
+num_candidates: 32 # number of structures to generate for each composition (total number of structures is num_compositions * num_candidates)
+seed: null
+selection_strategy: "random" # uses GridSearchPlanner with random selection strategy

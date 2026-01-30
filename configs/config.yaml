@@ -1,0 +1,32 @@
+defaults:
+  - agent: random_generator_baseline
+  - dataset: phase_diagram
+  - environment: convex_hull
+  - logger: wandb
+  - oracle: orb
+  - _self_
+
+# Global experiment settings
+experiment:
+  output_dir: ${hydra:run.dir}
+  num_episodes: 3
+  seed: null
+  infra: local   # local, modal
+  verbose: true # print info during episode
+  logging_level: INFO  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  # for multi-system evaluation run_multi_systems.py
+  # List of chemical systems to evaluate (each a list of element symbols)
+  # Example: [[Co, Nb, Sn], [Li, O], [Si, Ge, Sn]]
+  systems: []
+  # Alternatively, provide a JSON file containing [[El, El, ...], ...]
+  systems_file: null
+  # If set, limit the number of systems loaded from systems_file/systems
+  max_systems: 5
+
+hydra:
+  run:
+    dir: ${hydra:runtime.cwd}/results/${now:%Y%m%d-%H%M%S}-${hydra:runtime.choices.oracle}-${hydra:runtime.choices.agent}
+  sweep:
+    dir: ${hydra.run.dir}
+    subdir: ${hydra.job.num}
+

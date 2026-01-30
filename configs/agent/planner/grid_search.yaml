@@ -1,0 +1,31 @@
+_target_: made.agents.planners.grid_search.GridSearchPlanner
+
+# Basic parameters
+max_stoichiometry: 20  # maximum number of atoms in compositions
+num_compositions: 1    # number of compositions to generate per step
+num_candidates: 32      # number of structures to tell the generator to generate for each composition
+seed: null              # random seed for reproducibility
+score_function: "e_above_hull" # "energy_per_atom", "formation_energy_per_atom", "e_above_hull"
+filter_by_smact_validity: true  # if true, only enumerate compositions that pass SMACT validity checks
+return_all_compositions: false  # if true, return all valid compositions in plan (useful with cached generator, ignores selection strategy)
+
+# Strategy selection - choose one of:
+# "random", "ucb", "unexplored", "iterative" or "diversity"
+selection_strategy: "random"
+
+# Strategy-specific parameters
+selection_strategy_kwargs:
+  # For ucb strategies:
+  exploration_factor: 1.0  # balance between exploration and exploitation
+  ucb_reward: "failure_rate"  # "success_rate", "failure_rate" (1 - success_rate), "best_score" (which uses the score function)
+  
+  # For iterative and random strategies:
+  max_attempts_per_composition: 5  # filter out compositions tried N times
+  move_on_success: true           # filter out compositions with a stable configuration
+
+  # For diversity strategy:
+  distance_metric: "euclidean"
+  unattempted_weight: 5.0
+  attempt_weight_factor: 0.7
+  failure_weight_factor: 0.3
+  mask_same_reduced_formula: true # exclude comparisons between compositions with same reduced formula

@@ -1,0 +1,3 @@
+_target_: made.agents.filters.MinDistanceFilter
+min_distance_threshold: 0.5
+
